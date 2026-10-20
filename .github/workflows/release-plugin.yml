@@ -3,7 +3,7 @@ name: Release plugin package
 on:
   push:
     tags:
-      - "audio-cpp-v*"
+      - "*-v*"
   workflow_dispatch:
     inputs:
       plugin_id:
@@ -49,8 +49,13 @@ jobs:
           PLUGIN_VERSION: ${{ steps.coordinates.outputs.version }}
         run: |
           python scripts/package-plugin.py "$PLUGIN_ID" "$PLUGIN_VERSION"
-          gh release create "$PLUGIN_ID-v$PLUGIN_VERSION" \
-            "dist/$PLUGIN_ID-$PLUGIN_VERSION.zip" \
-            "dist/$PLUGIN_ID-$PLUGIN_VERSION.sha256" \
-            --title "$PLUGIN_ID v$PLUGIN_VERSION" \
-            --notes-file "plugins/$PLUGIN_ID/versions/$PLUGIN_VERSION/README.md"
+          tag="$PLUGIN_ID-v$PLUGIN_VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "dist/$PLUGIN_ID-$PLUGIN_VERSION.zip" "dist/$PLUGIN_ID-$PLUGIN_VERSION.sha256" --clobber
+          else
+            gh release create "$tag" \
+              "dist/$PLUGIN_ID-$PLUGIN_VERSION.zip" \
+              "dist/$PLUGIN_ID-$PLUGIN_VERSION.sha256" \
+              --title "$PLUGIN_ID v$PLUGIN_VERSION" \
+              --notes-file "plugins/$PLUGIN_ID/versions/$PLUGIN_VERSION/README.md"
+          fi
