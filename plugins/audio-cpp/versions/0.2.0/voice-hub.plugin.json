@@ -1,0 +1,18 @@
+{
+  "id": "audio-cpp",
+  "name": "audio.cpp 本地音频",
+  "version": "0.2.0",
+  "api_version": "1",
+  "description": "接入 audio.cpp 原生工作台的文本转语音、ASR、音乐/视频生成、语音转换、增强/降噪、音源分离、音频分析和音色设计；已注册的离线 TTS 同时接入 Voice Hub 合成页与网关。",
+  "author": "Voice Hub",
+  "runtime": "external_http",
+  "endpoint": "http://127.0.0.1:8791",
+  "workbench_url": "http://127.0.0.1:8080",
+  "capabilities": ["synthesis", "voices", "workbench"],
+  "settings": [
+    {"key": "manage_process", "label": "自动启动服务", "description": "启用时自动准备适配服务；audio.cpp 未运行时也会自动启动。停用时仅结束插件启动的进程。", "type": "boolean", "default": true},
+    {"key": "audio_cpp_dir", "label": "audio.cpp 安装目录", "description": "留空时自动寻找 Voice Hub 同级的 audio.cpp 文件夹。目录内须有编译好的 audiocpp_server。", "type": "string", "default": ""},
+    {"key": "audio_cpp_backend", "label": "硬件后端", "description": "auto、cpu、cuda、vulkan 或 metal；auto 根据所选构建检测 CUDA，否则使用 CPU。", "type": "string", "default": "auto"},
+    {"key": "workbench_url", "label": "原生工作台地址", "description": "audio.cpp 原生服务地址，须与适配服务使用不同端口。", "type": "string", "default": "http://127.0.0.1:8080"}
+  ]
+}

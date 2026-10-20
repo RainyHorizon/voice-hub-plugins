@@ -1,0 +1,56 @@
+name: Release plugin package
+
+on:
+  push:
+    tags:
+      - "audio-cpp-v*"
+  workflow_dispatch:
+    inputs:
+      plugin_id:
+        description: Plugin ID
+        required: true
+        type: string
+      version:
+        description: Semantic version
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Resolve release coordinates
+        id: coordinates
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            plugin_id="${{ inputs.plugin_id }}"
+            version="${{ inputs.version }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+            plugin_id="${tag%%-v*}"
+            version="${tag#*-v}"
+          fi
+          echo "plugin_id=$plugin_id" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Verify package and registry checksum
+        run: python scripts/validate-registry.py --package "${{ steps.coordinates.outputs.plugin_id }}" "${{ steps.coordinates.outputs.version }}"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLUGIN_ID: ${{ steps.coordinates.outputs.plugin_id }}
+          PLUGIN_VERSION: ${{ steps.coordinates.outputs.version }}
+        run: |
+          python scripts/package-plugin.py "$PLUGIN_ID" "$PLUGIN_VERSION"
+          gh release create "$PLUGIN_ID-v$PLUGIN_VERSION" \
+            "dist/$PLUGIN_ID-$PLUGIN_VERSION.zip" \
+            "dist/$PLUGIN_ID-$PLUGIN_VERSION.sha256" \
+            --title "$PLUGIN_ID v$PLUGIN_VERSION" \
+            --notes-file "plugins/$PLUGIN_ID/versions/$PLUGIN_VERSION/README.md"
