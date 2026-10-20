@@ -9,7 +9,7 @@
       "author": "RainyHorizon",
       "homepage": "https://github.com/RainyHorizon/voice-hub-plugins",
       "archive_url": "https://github.com/RainyHorizon/voice-hub-plugins/releases/download/audio-cpp-v0.2.0/audio-cpp-0.2.0.zip",
-      "sha256": "4cdeff1490621cd11c8d3c60f7b62c6c947b118e700624f06767c907206246df",
+      "sha256": "b3a32e00fe17fd1c52dd30b832da2939e3e7f6aac57833c7174b9eccabf4266f",
       "min_voice_hub_version": "1.7.0"
     }
   ]

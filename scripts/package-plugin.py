@@ -28,7 +28,12 @@ def main() -> int:
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
         for path in sorted(source.rglob("*")):
             if path.is_file():
-                bundle.write(path, f"{plugin_id}/{path.relative_to(source).as_posix()}")
+                name = f"{plugin_id}/{path.relative_to(source).as_posix()}"
+                info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.create_system = 3
+                info.external_attr = 0o100644 << 16
+                bundle.writestr(info, path.read_bytes())
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
     (output_dir / f"{plugin_id}-{version}.sha256").write_text(f"{digest}  {archive.name}\n", encoding="ascii")
     print(digest)
